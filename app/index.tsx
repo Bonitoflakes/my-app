@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Link } from "expo-router";
-import Button from "@/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Camera, Send, Menu } from "lucide-react-native";
 
 const Index = () => {
@@ -10,34 +10,33 @@ const Index = () => {
       <Link href="/_sitemap">Sitemap</Link>
 
       <Button onPress={() => console.log("Login with Email")}>
-        <Button.Icon icon={Camera} />
-        <Button.Text>Login with Email</Button.Text>
+        <ButtonIcon icon={Camera} />
+        <ButtonText>Login with Email</ButtonText>
       </Button>
 
       <Button variant="destructive" onPress={() => console.log("Delete Account")}>
-        <Button.Text>Delete Account</Button.Text>
-        <Button.Icon icon={Send} />
+        <ButtonText>Delete Account</ButtonText>
+        <ButtonIcon icon={Send} />
       </Button>
 
       <Button variant="outline">
-        <Button.Icon icon={Menu} />
-        <Button.Text>Continue with Github</Button.Text>
+        <ButtonIcon icon={Menu} />
+        <ButtonText>Continue with Github</ButtonText>
       </Button>
 
       <Button variant="outline">
-        <Button.Icon icon={Menu} />
+        <ButtonIcon icon={Menu} />
       </Button>
 
       <Button size="sm">
-        <Button.Text>Small Button</Button.Text>
+        <ButtonText>Small Button</ButtonText>
       </Button>
 
-      <Link href="/signin">
+      <Link href="/signin" asChild>
         <Button variant="link">
-          <Button.Text>Sign In</Button.Text>
+          <ButtonText>Sign In</ButtonText>
         </Button>
       </Link>
-      
     </View>
   );
 };

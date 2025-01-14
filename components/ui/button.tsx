@@ -1,6 +1,5 @@
-import React, { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, forwardRef } from "react";
 import {
-  TouchableOpacity,
   Text,
   StyleSheet,
   View,
@@ -188,32 +187,30 @@ const ButtonIcon = ({ icon: Icon, style }: ButtonIconProps) => {
   );
 };
 
-const Button = ({
-  children,
-  variant = "primary",
-  size = "md",
-  disabled = false,
-  onPress,
-  style,
-}: ButtonProps) => {
-  return (
-    <ButtonContext.Provider value={{ variant, size, disabled }}>
-      <TouchableOpacity
-        onPress={onPress}
-        disabled={disabled}
-        style={[
-          styles.button,
-          ButtonVariants[variant].base,
-          ButtonSizes[size].button,
-          disabled && styles.disabled,
-          style,
-        ]}
-      >
-        <View style={styles.contentContainer}>{children}</View>
-      </TouchableOpacity>
-    </ButtonContext.Provider>
-  );
-};
+const Button = forwardRef<typeof Pressable, ButtonProps>(
+  (
+    { children, variant = "primary", size = "md", disabled = false, onPress, style },
+    _ref
+  ) => {
+    return (
+      <ButtonContext.Provider value={{ variant, size, disabled }}>
+        <Pressable
+          onPress={onPress}
+          disabled={disabled}
+          style={[
+            styles.button,
+            ButtonVariants[variant].base,
+            ButtonSizes[size].button,
+            disabled && styles.disabled,
+            style,
+          ]}
+        >
+          <View style={styles.contentContainer}>{children}</View>
+        </Pressable>
+      </ButtonContext.Provider>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   button: {
@@ -239,12 +236,4 @@ const styles = StyleSheet.create({
   },
 });
 
-// Attach compound components
-Button.Text = ButtonText;
-Button.Icon = ButtonIcon;
-
-const ForwardrefButton = React.forwardRef<typeof Pressable, ButtonProps>((props, ref) => (
-  <Button {...props} ref={ref} />
-));
-
-export default Button;
+export { Button, ButtonText, ButtonIcon };
