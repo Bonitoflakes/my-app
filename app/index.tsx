@@ -20,7 +20,6 @@ const Index = () => {
       </Button>
 
       <Button variant="outline">
-        <ButtonIcon icon={Menu} />
         <ButtonText>Continue with Github</ButtonText>
       </Button>
 

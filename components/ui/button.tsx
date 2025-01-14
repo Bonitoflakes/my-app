@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode, forwardRef } from "react";
+import { createContext, useContext, ReactNode, forwardRef, ElementRef } from "react";
 import {
   Text,
   StyleSheet,
@@ -187,15 +187,16 @@ const ButtonIcon = ({ icon: Icon, style }: ButtonIconProps) => {
   );
 };
 
-const Button = forwardRef<typeof Pressable, ButtonProps>(
+const Button = forwardRef<ElementRef<typeof Pressable>, ButtonProps>(
   (
     { children, variant = "primary", size = "md", disabled = false, onPress, style },
-    _ref
+    ref
   ) => {
     return (
       <ButtonContext.Provider value={{ variant, size, disabled }}>
         <Pressable
           onPress={onPress}
+          ref={ref}
           role="button"
           disabled={disabled}
           style={[
@@ -206,7 +207,7 @@ const Button = forwardRef<typeof Pressable, ButtonProps>(
             style,
           ]}
         >
-          <View style={styles.contentContainer}>{children}</View>
+          {children}
         </Pressable>
       </ButtonContext.Provider>
     );
@@ -219,11 +220,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-  },
-  contentContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
     gap: 8,
   },
   text: {
