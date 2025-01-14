@@ -13,25 +13,44 @@ import { type LucideIcon } from "lucide-react-native";
 type ButtonVariant = "primary" | "destructive" | "outline" | "ghost" | "link";
 type ButtonSize = "sm" | "md" | "lg";
 
-interface ButtonVariantStyles {
+type ButtonVariantStyles = {
   base: ViewStyle;
   text: TextStyle;
-}
+};
 
-interface ButtonSizeStyles {
+type ButtonSizeStyles = {
   button: ViewStyle;
   text: TextStyle;
   icon: {
     width: number;
     height: number;
   };
-}
+};
 
-interface ButtonContextType {
+type ButtonContextType = {
   variant: ButtonVariant;
   size: ButtonSize;
   disabled: boolean;
-}
+};
+
+type ButtonProps = {
+  children: ReactNode;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  disabled?: boolean;
+  onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
+};
+
+type ButtonTextProps = {
+  children: string;
+  style?: StyleProp<TextStyle>;
+};
+
+type ButtonIconProps = {
+  icon: LucideIcon;
+  style?: StyleProp<ViewStyle>;
+};
 
 const ButtonContext = createContext<ButtonContextType | null>(null);
 
@@ -42,25 +61,6 @@ const useButtonContext = () => {
   }
   return context;
 };
-
-interface ButtonProps {
-  children: ReactNode;
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  disabled?: boolean;
-  onPress?: () => void;
-  style?: StyleProp<ViewStyle>;
-}
-
-interface ButtonTextProps {
-  children: string;
-  style?: StyleProp<TextStyle>;
-}
-
-interface ButtonIconProps {
-  icon: LucideIcon;
-  style?: StyleProp<ViewStyle>;
-}
 
 const ButtonVariants: Record<ButtonVariant, ButtonVariantStyles> = {
   primary: {
@@ -196,6 +196,7 @@ const Button = forwardRef<typeof Pressable, ButtonProps>(
       <ButtonContext.Provider value={{ variant, size, disabled }}>
         <Pressable
           onPress={onPress}
+          role="button"
           disabled={disabled}
           style={[
             styles.button,
