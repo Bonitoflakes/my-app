@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Link } from "expo-router";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Camera, Send, Menu } from "lucide-react-native";
@@ -33,7 +33,16 @@ const Index = () => {
         <ButtonIcon icon={Menu} />
       </Button>
 
-      <Button size="sm">
+      <Button
+        size="sm"
+        style={({ pressed }) => [
+          {
+            backgroundColor: pressed ? "lightgray" : "white",
+            padding: 10,
+            borderRadius: 5,
+          },
+        ]}
+      >
         <ButtonText>Small Button</ButtonText>
       </Button>
 
@@ -42,6 +51,22 @@ const Index = () => {
           <ButtonText>Sign In</ButtonText>
         </Button>
       </Link>
+
+      <Pressable
+        style={({ pressed }) => [
+          {
+            backgroundColor: pressed ? "pink" : "white",
+            padding: 10,
+            borderRadius: 5,
+          },
+        ]}
+      >
+        {({ pressed }) => (
+          <View>
+            <Text style={{ color: pressed ? "blue" : "black" }}>hello world</Text>
+          </View>
+        )}
+      </Pressable>
     </View>
   );
 };
