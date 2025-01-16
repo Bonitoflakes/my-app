@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { createContext, useContext, ReactNode, forwardRef, ElementRef } from "react";
 import {
   Text,
@@ -20,7 +20,6 @@ type ButtonContextType = {
 };
 
 type ButtonProps = PressableProps & {
-  children: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
 };
@@ -28,11 +27,13 @@ type ButtonProps = PressableProps & {
 type ButtonTextProps = {
   children: string;
   style?: StyleProp<TextStyle>;
+  pressed?: boolean;
 };
 
 type ButtonIconProps = {
   icon: LucideIcon;
   style?: StyleProp<ViewStyle>;
+  pressed?: boolean;
 };
 
 const ButtonContext = createContext<ButtonContextType | null>(null);
@@ -44,6 +45,126 @@ const useButtonContext = () => {
   }
   return context;
 };
+
+const Button = forwardRef<ElementRef<typeof Pressable>, ButtonProps>(
+  (
+    {
+      children,
+      variant = "primary",
+      size = "md",
+      disabled = false,
+      onPress,
+      style,
+      ...props
+    },
+    ref
+  ) => {
+    const renderChildren = (state: PressableStateCallbackType) => {
+      // Handle function children
+      if (typeof children === "function") {
+        return children(state);
+      }
+
+      // Handle single child
+      if (React.isValidElement(children)) {
+        return React.cloneElement(children, state);
+      }
+
+      // Handle multiple children
+      if (Array.isArray(children)) {
+        console.log(children)
+        return children.map((child, index) => {
+          if (React.isValidElement(child)) {
+            return React.cloneElement(child, {
+              key: child.key ?? index,
+              ...state,
+            });
+          }
+          return child;
+        });
+      }
+
+      // Return as-is for other cases (string, number, etc.)
+      return children;
+    };
+
+    return (
+      <ButtonContext.Provider value={{ variant, size, disabled }}>
+        <Pressable
+          onPress={onPress}
+          ref={ref}
+          role="button"
+          disabled={disabled}
+          style={(state) => [
+            styles.button,
+            ButtonVariants[variant].base,
+            ButtonSizes[size].button,
+            disabled && styles.disabled,
+            state.pressed && styles.pressed,
+            typeof style === "function" ? style(state) : style,
+          ]}
+          {...props}
+        >
+          {(state) => renderChildren(state)}
+        </Pressable>
+      </ButtonContext.Provider>
+    );
+  }
+);
+
+const ButtonText = (props: ButtonTextProps) => {
+  const { variant, size, disabled } = useButtonContext();
+  const { pressed, children, style } = props;
+
+  return (
+    <Text
+      style={[
+        styles.text,
+        ButtonVariants[variant].text,
+        ButtonSizes[size].text,
+        disabled && styles.disabledText,
+        pressed && { color: "purple" },
+        style,
+      ]}
+    >
+      {children}
+    </Text>
+  );
+};
+
+const ButtonIcon = (props: ButtonIconProps) => {
+  const { variant, size } = useButtonContext();
+  const { icon: Icon, style, pressed } = props;
+
+  return (
+    <View style={[pressed && { backgroundColor: "pink" }, style]}>
+      <Icon
+        size={ButtonSizes[size].icon.width}
+        color={ButtonVariants[variant].text.color}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  button: {
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
+  },
+  text: {
+    fontWeight: "500",
+  },
+  disabled: {
+    opacity: 0.5,
+  },
+  disabledText: {
+    opacity: 0.7,
+  },
+  pressed: {},
+});
 
 const ButtonVariants: Record<ButtonVariant, ButtonVariantStyles> = {
   primary: {
@@ -140,132 +261,6 @@ const ButtonSizes: Record<ButtonSize, ButtonSizeStyles> = {
     },
   },
 };
-
-const Button = forwardRef<ElementRef<typeof Pressable>, ButtonProps>(
-  (
-    {
-      children,
-      variant = "primary",
-      size = "md",
-      disabled = false,
-      onPress,
-      style,
-      ...props
-    },
-    ref
-  ) => {
-    const [pressed, setPressed] = useState(false);
-
-    const renderChildren = (state: PressableStateCallbackType) => {
-      // Handle function children
-      if (typeof children === "function") {
-        return children(state);
-      }
-
-      // Handle single child
-      if (React.isValidElement(children)) {
-        return React.cloneElement(children, state);
-      }
-
-      // Handle multiple children
-      if (Array.isArray(children)) {
-        return children.map((child, index) => {
-          if (React.isValidElement(child)) {
-            return React.cloneElement(child, {
-              key: child.key ?? index,
-              ...state,
-            });
-          }
-          return child;
-        });
-      }
-
-      // Return as-is for other cases (string, number, etc.)
-      return children;
-    };
-
-    return (
-      <ButtonContext.Provider value={{ variant, size, disabled }}>
-        <Pressable
-          onPress={onPress}
-          ref={ref}
-          role="button"
-          disabled={disabled}
-          onPressIn={() => setPressed(true)}
-          onPressOut={() => setPressed(false)}
-          style={(state) => [
-            styles.button,
-            ButtonVariants[variant].base,
-            ButtonSizes[size].button,
-            disabled && styles.disabled,
-            state.pressed && styles.pressed,
-            typeof style === "function" ? style(state) : style,
-          ]}
-          {...props}
-        >
-          {/* {(state) => {
-            return cloneElement(children as React.ReactElement, {
-              state,
-            });
-          }} */}
-          {(state) => renderChildren(state)}
-        </Pressable>
-      </ButtonContext.Provider>
-    );
-  }
-);
-
-const ButtonText = (props: ButtonTextProps) => {
-  const { variant, size, disabled } = useButtonContext();
-
-  console.log("ButtonText");
-  console.table(props);
-  return (
-    <Text
-      style={[
-        styles.text,
-        ButtonVariants[variant].text,
-        ButtonSizes[size].text,
-        disabled && styles.disabledText,
-        props.style,
-      ]}
-    >
-      {props.children}
-    </Text>
-  );
-};
-
-const ButtonIcon = (props: ButtonIconProps) => {
-  const { variant, size } = useButtonContext();
-  const iconSize = ButtonSizes[size].icon.width;
-
-  const { icon: Icon, style } = props;
-  return (
-    <View style={[style]}>
-      <Icon size={iconSize} color={ButtonVariants[variant].text.color} />
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  button: {
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 8,
-  },
-  text: {
-    fontWeight: "500",
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  disabledText: {
-    opacity: 0.7,
-  },
-  pressed: {},
-});
 
 type ButtonVariant = "primary" | "destructive" | "outline" | "ghost" | "link";
 type ButtonSize = "sm" | "md" | "lg";
