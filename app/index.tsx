@@ -52,7 +52,7 @@ const Index = () => {
         </Button>
       </Link>
 
-      <Pressable
+      {/* <Pressable
         style={({ pressed }) => [
           {
             backgroundColor: pressed ? "pink" : "white",
@@ -66,7 +66,7 @@ const Index = () => {
             <Text style={{ color: pressed ? "blue" : "black" }}>hello world</Text>
           </View>
         )}
-      </Pressable>
+      </Pressable> */}
     </View>
   );
 };

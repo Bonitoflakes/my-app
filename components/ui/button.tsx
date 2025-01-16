@@ -1,46 +1,28 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { createContext, useContext, ReactNode, forwardRef, ElementRef } from "react";
 import {
   Text,
   StyleSheet,
   View,
-  StyleProp,
-  ViewStyle,
-  TextStyle,
   Pressable,
-  PressableProps,
+  type StyleProp,
+  type ViewStyle,
+  type TextStyle,
+  type PressableProps,
+  type PressableStateCallbackType,
 } from "react-native";
 import { type LucideIcon } from "lucide-react-native";
-
-type ButtonVariant = "primary" | "destructive" | "outline" | "ghost" | "link";
-type ButtonSize = "sm" | "md" | "lg";
-
-type ButtonVariantStyles = {
-  base: ViewStyle;
-  text: TextStyle;
-};
-
-type ButtonSizeStyles = {
-  button: ViewStyle;
-  text: TextStyle;
-  icon: {
-    width: number;
-    height: number;
-  };
-};
 
 type ButtonContextType = {
   variant: ButtonVariant;
   size: ButtonSize;
   disabled: boolean | null;
-  pressed: boolean;
 };
 
 type ButtonProps = PressableProps & {
   children: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
-  style?: StyleProp<ViewStyle>;
 };
 
 type ButtonTextProps = {
@@ -49,7 +31,7 @@ type ButtonTextProps = {
 };
 
 type ButtonIconProps = {
-  Icon: LucideIcon;
+  icon: LucideIcon;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -174,8 +156,36 @@ const Button = forwardRef<ElementRef<typeof Pressable>, ButtonProps>(
   ) => {
     const [pressed, setPressed] = useState(false);
 
+    const renderChildren = (state: PressableStateCallbackType) => {
+      // Handle function children
+      if (typeof children === "function") {
+        return children(state);
+      }
+
+      // Handle single child
+      if (React.isValidElement(children)) {
+        return React.cloneElement(children, state);
+      }
+
+      // Handle multiple children
+      if (Array.isArray(children)) {
+        return children.map((child, index) => {
+          if (React.isValidElement(child)) {
+            return React.cloneElement(child, {
+              key: child.key ?? index,
+              ...state,
+            });
+          }
+          return child;
+        });
+      }
+
+      // Return as-is for other cases (string, number, etc.)
+      return children;
+    };
+
     return (
-      <ButtonContext.Provider value={{ variant, size, disabled, pressed }}>
+      <ButtonContext.Provider value={{ variant, size, disabled }}>
         <Pressable
           onPress={onPress}
           ref={ref}
@@ -193,14 +203,12 @@ const Button = forwardRef<ElementRef<typeof Pressable>, ButtonProps>(
           ]}
           {...props}
         >
-          {(state) => {
-            return (
-              <View>
-                <Text style={{ color: pressed ? "blue" : "black" }}>hello world</Text>
-              </View>
-            );
-          }}
-          {/* {children} */}
+          {/* {(state) => {
+            return cloneElement(children as React.ReactElement, {
+              state,
+            });
+          }} */}
+          {(state) => renderChildren(state)}
         </Pressable>
       </ButtonContext.Provider>
     );
@@ -210,7 +218,8 @@ const Button = forwardRef<ElementRef<typeof Pressable>, ButtonProps>(
 const ButtonText = (props: ButtonTextProps) => {
   const { variant, size, disabled } = useButtonContext();
 
-  console.log({ textprops: props });
+  console.log("ButtonText");
+  console.table(props);
   return (
     <Text
       style={[
@@ -230,9 +239,10 @@ const ButtonIcon = (props: ButtonIconProps) => {
   const { variant, size } = useButtonContext();
   const iconSize = ButtonSizes[size].icon.width;
 
+  const { icon: Icon, style } = props;
   return (
-    <View style={[props.style]}>
-      <props.Icon size={iconSize} color={ButtonVariants[variant].text.color} />
+    <View style={[style]}>
+      <Icon size={iconSize} color={ButtonVariants[variant].text.color} />
     </View>
   );
 };
@@ -256,5 +266,22 @@ const styles = StyleSheet.create({
   },
   pressed: {},
 });
+
+type ButtonVariant = "primary" | "destructive" | "outline" | "ghost" | "link";
+type ButtonSize = "sm" | "md" | "lg";
+
+type ButtonVariantStyles = {
+  base: ViewStyle;
+  text: TextStyle;
+};
+
+type ButtonSizeStyles = {
+  button: ViewStyle;
+  text: TextStyle;
+  icon: {
+    width: number;
+    height: number;
+  };
+};
 
 export { Button, ButtonText, ButtonIcon };
