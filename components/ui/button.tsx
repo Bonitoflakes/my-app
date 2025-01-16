@@ -7,6 +7,7 @@ import {
   ViewStyle,
   TextStyle,
   Pressable,
+  PressableProps,
 } from "react-native";
 import { type LucideIcon } from "lucide-react-native";
 
@@ -30,15 +31,13 @@ type ButtonSizeStyles = {
 type ButtonContextType = {
   variant: ButtonVariant;
   size: ButtonSize;
-  disabled: boolean;
+  disabled: boolean | null;
 };
 
-type ButtonProps = {
+type ButtonProps = PressableProps & {
   children: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
-  disabled?: boolean;
-  onPress?: () => void;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -189,7 +188,7 @@ const ButtonIcon = ({ icon: Icon, style }: ButtonIconProps) => {
 
 const Button = forwardRef<ElementRef<typeof Pressable>, ButtonProps>(
   (
-    { children, variant = "primary", size = "md", disabled = false, onPress, style },
+    { children, variant = "primary", size = "md", disabled = false, onPress, style, ...props },
     ref
   ) => {
     return (

@@ -9,7 +9,10 @@ const Index = () => {
       <Text>This is / page.</Text>
       <Link href="/_sitemap">Sitemap</Link>
 
-      <Button onPress={() => console.log("Login with Email")}>
+      <Button
+        onPress={() => console.log("Login with Email")}
+        style={{ borderColor: "red", borderWidth: 2, borderRadius: 25 }}
+      >
         <ButtonIcon icon={Camera} />
         <ButtonText>Login with Email</ButtonText>
       </Button>
@@ -19,7 +22,10 @@ const Index = () => {
         <ButtonIcon icon={Send} />
       </Button>
 
-      <Button variant="outline">
+      <Button
+        variant="outline"
+        style={({ pressed }) => [pressed && styles.pressed, styles.override]}
+      >
         <ButtonText>Continue with Github</ButtonText>
       </Button>
 
@@ -48,5 +54,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 16,
+    backgroundColor: "black",
+  },
+  pressed: {
+    opacity: 0.5,
+  },
+  override: {
+    backgroundColor: "red",
+    color: "white",
   },
 });
