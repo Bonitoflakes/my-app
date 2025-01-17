@@ -43,7 +43,19 @@ const Index = () => {
           },
         ]}
       >
-        <ButtonText>Small Button</ButtonText>
+        {({ pressed }) => {
+          return (
+            <ButtonText
+              style={[
+                {
+                  color: pressed ? "orange" : "purple",
+                },
+              ]}
+            >
+              Small Button
+            </ButtonText>
+          );
+        }}
       </Button>
 
       <Link href="/signin" asChild>
