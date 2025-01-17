@@ -27,13 +27,13 @@ type ButtonProps = PressableProps & {
 type ButtonTextProps = {
   children: string;
   style?: StyleProp<TextStyle>;
-  pressed?: boolean;
+  // pressed?: boolean;
 };
 
 type ButtonIconProps = {
   icon: LucideIcon;
   style?: StyleProp<ViewStyle>;
-  pressed?: boolean;
+  // pressed?: boolean;
 };
 
 const ButtonContext = createContext<ButtonContextType | null>(null);
@@ -59,35 +59,6 @@ const Button = forwardRef<ElementRef<typeof Pressable>, ButtonProps>(
     },
     ref
   ) => {
-    const renderChildren = (state: PressableStateCallbackType) => {
-      // Handle function children
-      if (typeof children === "function") {
-        return children(state);
-      }
-
-      // Handle single child
-      if (React.isValidElement(children)) {
-        return React.cloneElement(children, state);
-      }
-
-      // Handle multiple children
-      if (Array.isArray(children)) {
-        console.log(children)
-        return children.map((child, index) => {
-          if (React.isValidElement(child)) {
-            return React.cloneElement(child, {
-              key: child.key ?? index,
-              ...state,
-            });
-          }
-          return child;
-        });
-      }
-
-      // Return as-is for other cases (string, number, etc.)
-      return children;
-    };
-
     return (
       <ButtonContext.Provider value={{ variant, size, disabled }}>
         <Pressable
@@ -105,7 +76,7 @@ const Button = forwardRef<ElementRef<typeof Pressable>, ButtonProps>(
           ]}
           {...props}
         >
-          {(state) => renderChildren(state)}
+          {children}
         </Pressable>
       </ButtonContext.Provider>
     );
@@ -114,7 +85,7 @@ const Button = forwardRef<ElementRef<typeof Pressable>, ButtonProps>(
 
 const ButtonText = (props: ButtonTextProps) => {
   const { variant, size, disabled } = useButtonContext();
-  const { pressed, children, style } = props;
+  const { children, style } = props;
 
   return (
     <Text
@@ -123,7 +94,6 @@ const ButtonText = (props: ButtonTextProps) => {
         ButtonVariants[variant].text,
         ButtonSizes[size].text,
         disabled && styles.disabledText,
-        pressed && { color: "purple" },
         style,
       ]}
     >
@@ -134,10 +104,10 @@ const ButtonText = (props: ButtonTextProps) => {
 
 const ButtonIcon = (props: ButtonIconProps) => {
   const { variant, size } = useButtonContext();
-  const { icon: Icon, style, pressed } = props;
+  const { icon: Icon, style } = props;
 
   return (
-    <View style={[pressed && { backgroundColor: "pink" }, style]}>
+    <View style={[{ backgroundColor: "pink" }, style]}>
       <Icon
         size={ButtonSizes[size].icon.width}
         color={ButtonVariants[variant].text.color}

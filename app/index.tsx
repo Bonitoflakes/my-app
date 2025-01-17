@@ -30,7 +30,18 @@ const Index = () => {
       </Button>
 
       <Button variant="outline">
-        <ButtonIcon icon={Menu} />
+        {({ pressed }) => {
+          return (
+            <ButtonIcon
+              icon={Menu}
+              style={[
+                {
+                  backgroundColor: pressed ? "orange" : "black",
+                },
+              ]}
+            />
+          );
+        }}
       </Button>
 
       <Button
